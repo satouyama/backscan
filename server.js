@@ -14,10 +14,15 @@ const TELEGRAM_CHAT_ID = "CHAT-TOKEN"; // Substitua pelo ID do chat (ou grupo) p
 app.post("/send-location", async (req, res) => {
   const { coords, device } = req.body;
   console.log(coords, device)
-
+  const base = 'https://www.google.com/maps';
+  const localization = `${coords.latitude},${coords.longitude}`;
 
   try {
-    console.table({ latitude: coords.latitude, longitude: coords.longitude });
+    console.table({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      searchUrl: `${base}/search/?api=1&query=${encodeURIComponent(localization)}`,
+    });
 
     res.status(200).json({ success: true });
   } catch (error) {
